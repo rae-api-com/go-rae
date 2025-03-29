@@ -57,18 +57,6 @@ func main() {
 }
 ```
 
-### Command Line Usage
-
-The repository also includes a simple command-line tool for quick lookups:
-
-```bash
-# Build the CLI tool
-go build -o rae-cli
-
-# Look up a word
-./rae-cli hablar
-```
-
 ## Response Structure
 
 The API returns structured data in the following format:
