@@ -16,7 +16,10 @@ type Client struct {
 }
 
 func New(opts ...ClientOption) *Client {
-	cli := new(Client)
+	cli := &Client{
+		timeout: 5 * time.Second,
+		version: "dev",
+	}
 
 	for _, opt := range opts {
 		opt(cli)
