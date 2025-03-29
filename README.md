@@ -28,12 +28,12 @@ import (
 	"os"
 	"time"
 
-	"github.com/rae-api-com/go-rae"
+	rae "github.com/rae-api-com/go-rae"
 )
 
 func main() {
 	// Create a new client
-	c := client.New()
+	c := rae.New()
 	
 	// Set a timeout context
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
