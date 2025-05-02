@@ -4,8 +4,8 @@ github.com/klauspost/compress v1.18.0 h1:c/Cqfb0r+Yi+JtIEq73FWXVkRonBlf0CRNYc8Zt
 github.com/klauspost/compress v1.18.0/go.mod h1:2Pp+KzxcywXVXMr50+X0Q/Lsb43OQHYWRCY2AiWywWQ=
 github.com/pkg/errors v0.9.1 h1:FEBLx1zS214owpjy7qsBeixbURkuhQAwrK5UwLGTwt4=
 github.com/pkg/errors v0.9.1/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
-github.com/sonirico/stadio v0.7.1 h1:V3QoX1djwqe0C3Kph7XyDmWkrQeNfzNLZek3rX6B4vM=
-github.com/sonirico/stadio v0.7.1/go.mod h1:4LwjfJhOZwHorB58wz5CNEe4Hbx3XwjLxmX/Imz2om4=
+github.com/sonirico/stadio v0.6.0 h1:KriP6AvxI3KH1qxjk4w8PmWBfuL1THBakmIaxJ3dSBs=
+github.com/sonirico/stadio v0.6.0/go.mod h1:4LwjfJhOZwHorB58wz5CNEe4Hbx3XwjLxmX/Imz2om4=
 github.com/sonirico/withttp v0.7.3 h1:i50PFBlvFHftu/8YWVT/LWbCP7rkuexpL2ixCRJUzbc=
 github.com/sonirico/withttp v0.7.3/go.mod h1:WPk/mDE1GhcpW94Yaue/PhnzA76DHr3HIPxtag4WZJ0=
 github.com/valyala/bytebufferpool v1.0.0 h1:GqA5TC/0021Y/b9FG4Oi9Mr3q7XYx6KllzawFIhcdPw=
