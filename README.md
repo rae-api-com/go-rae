@@ -1,22 +1,32 @@
-# rae-api.com Client
+# 📚 RAE API Go Client
 
-A Go client library for the rae-api.com, which provides programmatic access to word definitions, meanings, and verb conjugations from the Real Academia Española's (RAE) dictionary.
+[![Go Version](https://img.shields.io/github/go-mod/go-version/rae-api-com/go-rae)](https://golang.org/)
+[![Go Report Card](https://goreportcard.com/badge/github.com/rae-api-com/go-rae)](https://goreportcard.com/report/github.com/rae-api-com/go-rae)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Build Status](https://github.com/rae-api-com/go-rae/workflows/CI/badge.svg)](https://github.com/rae-api-com/go-rae/actions)
 
-## Overview
+Un cliente Go elegante y eficiente para la [rae-api.com](http://rae-api.com), que proporciona acceso programático a definiciones de palabras, significados y conjugaciones verbales del diccionario de la Real Academia Española (RAE).
 
-Lightweight Go client for the [http://rae-api.com](RAE-API) service. It allows you to easily retrieve definitions, meanings, and verb conjugations from the RAE dictionary in a clean, structured JSON format.
+## ✨ Características
 
-> **Note**: This is **not** an official RAE client, and usage of the rae-api.com is subject to the API's terms and conditions.
+- 🚀 **API Simple** - Interfaz limpia y fácil de usar
+- 📖 **Múltiples Significados** - Maneja palabras con múltiples acepciones
+- 🔄 **Conjugaciones Completas** - Todos los tiempos verbales (Indicativo, Subjuntivo, Imperativo)
+- 📝 **Definiciones Ricas** - Acceso a sinónimos, antónimos, etiquetas de uso
+- ⚡ **Lightweight** - Sin dependencias pesadas
+- 🎯 **Tipado Fuerte** - Estructuras de datos bien definidas
 
-## Installation
+> **Nota**: Este **no** es un cliente oficial de la RAE. El uso de rae-api.com está sujeto a los términos y condiciones de la API.
+
+## 📦 Instalación
 
 ```bash
 go get github.com/rae-api-com/go-rae
 ```
 
-## Usage
+## 🚀 Uso Rápido
 
-### Basic Usage
+### Ejemplo Básico
 
 ```go
 package main
@@ -25,41 +35,66 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"os"
+	"log"
 	"time"
 
 	rae "github.com/rae-api-com/go-rae"
 )
 
 func main() {
-	// Create a new client
-	c := rae.New()
+	// Crear un nuevo cliente
+	client := rae.New()
 	
-	// Set a timeout context
+	// Configurar timeout
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	
-	// Fetch word data
-	entry, err := c.Word(ctx, "hablar")
+	// Buscar una palabra
+	entry, err := client.Word(ctx, "hablar")
 	if err != nil {
-		fmt.Printf("Error: %s\n", err)
-		os.Exit(1)
+		log.Fatal(err)
 	}
 	
-	// Print result
-	data, err := json.MarshalIndent(entry, "", "  ")
-	if err != nil {
-		fmt.Printf("Error formatting output: %s\n", err)
-		os.Exit(1)
-	}
-	
+	// Mostrar resultado
+	data, _ := json.MarshalIndent(entry, "", "  ")
 	fmt.Println(string(data))
 }
 ```
 
-## Response Structure
+### Con Opciones Personalizadas
 
-The API returns structured data in the following format:
+```go
+client := rae.New(
+	rae.WithTimeout(10*time.Second),
+	rae.WithVersion("v1"),
+)
+```
+
+### Obtener Palabra Aleatoria
+
+```go
+// Palabra aleatoria
+randomWord, err := rae.GetRandom(ctx, "production")
+if err != nil {
+	log.Fatal(err)
+}
+fmt.Printf("Palabra del día: %s\n", randomWord)
+```
+
+### Obtener Palabra Diaria
+
+```go
+// Palabra diaria
+dailyWord, err := rae.GetDaily(ctx, "production")
+if err != nil {
+	log.Fatal(err)
+}
+fmt.Printf("Palabra diaria: %s\n", dailyWord)
+```
+
+## 📋 Estructura de Respuesta
+
+La API devuelve datos estructurados en el siguiente formato:
 
 ```json
 {
@@ -68,7 +103,7 @@ The API returns structured data in the following format:
     {
       "origin": {
         "raw": "Del lat. comedĕre.",
-        "type": "lat",
+        "type": "lat", 
         "text": "comedĕre"
       },
       "senses": [
@@ -78,40 +113,99 @@ The API returns structured data in the following format:
           "category": "verb",
           "usage": "common",
           "description": "Masticar y deglutir un alimento sólido.",
-          "synonyms": ["masticar", "etc."],
+          "synonyms": ["masticar", "deglutir"],
           "antonyms": []
         }
       ],
       "conjugations": {
         "non_personal": {
           "infinitive": "hablar",
-          "gerund": "comiendo",
-          "participle": "comido"
+          "gerund": "hablando", 
+          "participle": "hablado"
         },
         "indicative": {
           "present": {
-            "singular_first_person": "como",
-            // ... more conjugations
+            "singular_first_person": "hablo",
+            "singular_second_person": "hablas",
+            "singular_third_person": "habla"
+            // ... más conjugaciones
           }
         }
-        // ... more verb tenses
+        // ... más tiempos verbales
       }
     }
   ]
 }
 ```
 
-## Features
+## 🛠️ API Reference
 
-- **Multiple Meanings** - Handles words that have more than one acepción (e.g., *hablar<sup>1</sup>* and *hablar<sup>2</sup>*).
-- **Rich Definitions** - Access to synonyms, antonyms, usage labels (e.g., "colloquial", "desusado", etc.), and grammatical info.
-- **Complete Verb Conjugations** - Get all tenses (Indicative, Subjunctive, Imperative) and non-personal forms (infinitive, gerund, participle).
-- **Simple API** - Clean, easy-to-use interface for retrieving word data.
+### Tipos Principales
 
-## License
+```go
+type Client struct {
+    // campos internos
+}
 
-[MIT License](LICENSE)
+type Entry struct {
+    Word     string    `json:"word"`
+    Meanings []Meaning `json:"meanings"`
+}
 
-## Acknowledgements
+type Meaning struct {
+    Origin       Origin       `json:"origin"`
+    Senses       []Sense      `json:"senses"`
+    Conjugations Conjugations `json:"conjugations,omitempty"`
+}
+```
 
-This client uses the rae-api.com service, which is not affiliated with the Real Academia Española. All dictionary content belongs to the RAE and is subject to their terms and conditions.
+### Métodos del Cliente
+
+| Método                | Descripción                   | Ejemplo                      |
+| --------------------- | ----------------------------- | ---------------------------- |
+| `Word(ctx, word)`     | Busca una palabra específica  | `client.Word(ctx, "casa")`   |
+| `GetRandom(ctx, env)` | Obtiene una palabra aleatoria | `rae.GetRandom(ctx, "prod")` |
+| `GetDaily(ctx, env)`  | Obtiene la palabra del día    | `rae.GetDaily(ctx, "prod")`  |
+
+### Opciones de Configuración
+
+```go
+// Configurar timeout personalizado
+rae.WithTimeout(10 * time.Second)
+
+// Configurar versión de la API
+rae.WithVersion("v1")
+```
+
+## 🤝 Contribuir
+
+¡Las contribuciones son bienvenidas! Por favor:
+
+1. Haz fork del proyecto
+2. Crea una rama para tu feature (`git checkout -b feature/AmazingFeature`)
+3. Haz commit de tus cambios (`git commit -m 'Add some AmazingFeature'`)
+4. Push a la rama (`git push origin feature/AmazingFeature`)
+5. Abre un Pull Request
+
+## 📝 Licencia
+
+Este proyecto está bajo la [Licencia MIT](LICENSE).
+
+## 🙏 Reconocimientos
+
+- Este cliente utiliza el servicio [rae-api.com](http://rae-api.com), que no está afiliado con la Real Academia Española
+- Todo el contenido del diccionario pertenece a la RAE y está sujeto a sus términos y condiciones
+- Gracias a todos los [contribuidores](https://github.com/rae-api-com/go-rae/graphs/contributors)
+
+## 📧 Soporte
+
+Si encuentras algún problema o tienes sugerencias:
+
+- Abre un [issue](https://github.com/rae-api-com/go-rae/issues)
+- Consulta la [documentación](https://pkg.go.dev/github.com/rae-api-com/go-rae)
+
+---
+
+<div align="center">
+  Hecho con ❤️ para la comunidad Go
+</div>
