@@ -89,19 +89,19 @@ type WordEntryResponse = ApiResponse[WordEntry]
 
 var (
 	raeApi = withttp.NewEndpoint("RaeAPI").
-		Request(withttp.WithBaseURL("https://rae-api.com/api"))
+		Request(withttp.BaseURL("https://rae-api.com/api"))
 )
 
 func GetWord(
 	ctx context.Context,
 	version, word string,
 ) (*WordEntryResponse, error) {
-	call := withttp.NewCall[*WordEntryResponse](withttp.WithFasthttp()).
-		WithURI(fmt.Sprintf("/words/%s", word)).
-		WithMethod(http.MethodGet).
-		WithHeader("User-Agent", fmt.Sprintf("rae-api/%s See https://rae-api.com", version), false).
-		WithParseJSON().
-		WithExpectedStatusCodes(http.StatusOK)
+	call := withttp.NewCall[*WordEntryResponse](withttp.Fasthttp()).
+		URI(fmt.Sprintf("/words/%s", word)).
+		Method(http.MethodGet).
+		Header("User-Agent", fmt.Sprintf("rae-api/%s See https://rae-api.com", version), false).
+		ParseJSON().
+		ExpectedStatusCodes(http.StatusOK)
 
 	err := call.CallEndpoint(ctx, raeApi)
 
@@ -118,12 +118,12 @@ func GetDaily(
 	ctx context.Context,
 	version string,
 ) (*WordResponse, error) {
-	call := withttp.NewCall[*WordResponse](withttp.WithFasthttp()).
-		WithURI("daily").
-		WithMethod(http.MethodGet).
-		WithHeader("User-Agent", fmt.Sprintf("rae-api/%s See https://rae-api.com", version), false).
-		WithParseJSON().
-		WithExpectedStatusCodes(http.StatusOK)
+	call := withttp.NewCall[*WordResponse](withttp.Fasthttp()).
+		URI("daily").
+		Method(http.MethodGet).
+		Header("User-Agent", fmt.Sprintf("rae-api/%s See https://rae-api.com", version), false).
+		ParseJSON().
+		ExpectedStatusCodes(http.StatusOK)
 
 	err := call.CallEndpoint(ctx, raeApi)
 
@@ -134,12 +134,12 @@ func GetRandom(
 	ctx context.Context,
 	version string,
 ) (*WordResponse, error) {
-	call := withttp.NewCall[*WordResponse](withttp.WithFasthttp()).
-		WithURI("/random").
-		WithMethod(http.MethodGet).
-		WithHeader("User-Agent", fmt.Sprintf("rae-api/%s See https://rae-api.com", version), false).
-		WithParseJSON().
-		WithExpectedStatusCodes(http.StatusOK)
+	call := withttp.NewCall[*WordResponse](withttp.Fasthttp()).
+		URI("/random").
+		Method(http.MethodGet).
+		Header("User-Agent", fmt.Sprintf("rae-api/%s See https://rae-api.com", version), false).
+		ParseJSON().
+		ExpectedStatusCodes(http.StatusOK)
 
 	err := call.CallEndpoint(ctx, raeApi)
 
