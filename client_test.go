@@ -16,3 +16,8 @@ func TestDaily(t *testing.T) {
 
 	t.Log(GetDaily(context.Background(), "dev"))
 }
+
+func TestSearch(t *testing.T) {
+
+	t.Log(GetSearch(context.Background(), "dev", "", "perro"))
+}
