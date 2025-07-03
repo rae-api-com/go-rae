@@ -2,8 +2,10 @@ package rae
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/url"
 	"time"
 
 	"github.com/pkg/errors"
@@ -119,7 +121,7 @@ func GetDaily(
 	version string,
 ) (*WordResponse, error) {
 	call := withttp.NewCall[*WordResponse](withttp.Fasthttp()).
-		URI("daily").
+		URI("/daily").
 		Method(http.MethodGet).
 		Header("User-Agent", fmt.Sprintf("rae-api/%s See https://rae-api.com", version), false).
 		ParseJSON().
@@ -144,4 +146,59 @@ func GetRandom(
 	err := call.CallEndpoint(ctx, raeApi)
 
 	return call.BodyParsed, err
+}
+
+type searchResponseDoc struct {
+	Word string `json:"id"`
+	Raw  string `json:"raw"`
+}
+
+type searchResponse struct {
+	Doc  searchResponseDoc `json:"doc"`
+	Hits int               `json:"hits"`
+}
+
+func GetSearch(
+	ctx context.Context,
+	version string,
+	engine string,
+	terms string,
+) ([]WordEntry, error) {
+	terms = url.QueryEscape(terms)
+	uri := fmt.Sprintf("/search?q=%s", terms)
+	if engine != "" {
+		uri += fmt.Sprintf("&eng=%s", engine)
+	}
+
+	call := withttp.NewCall[[]searchResponse](withttp.Fasthttp()).
+		URI("/search").
+		Query("q", terms)
+
+	if engine != "" {
+		call = call.Query("eng", engine)
+	}
+
+	call.Method(http.MethodGet).
+		Header("User-Agent", fmt.Sprintf("rae-api/%s See https://rae-api.com", version), false).
+		ParseJSON().
+		ExpectedStatusCodes(http.StatusOK)
+
+	err := call.CallEndpoint(ctx, raeApi)
+
+	if err != nil {
+		return nil, errors.Wrapf(err, "failed to search for terms %s", terms)
+	}
+
+	res := make([]WordEntry, 0, len(call.BodyParsed))
+
+	for _, hit := range call.BodyParsed {
+		var doc WordEntry
+		if err := json.Unmarshal([]byte(hit.Doc.Raw), &doc); err != nil {
+			return nil, errors.Wrapf(err, "failed to unmarshal doc %s", hit.Doc.Word)
+		}
+		doc.Word = hit.Doc.Word
+		res = append(res, doc)
+	}
+
+	return res, nil
 }
