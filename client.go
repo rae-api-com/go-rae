@@ -37,13 +37,19 @@ func (c *Client) Word(ctx context.Context, word string) (WordEntry, error) {
 	res, err := GetWord(ctx, c.version, word)
 
 	if err != nil {
-		return WordEntry{}, err
+		return WordEntry{
+			Word:        word,
+			Suggestions: res.Suggestions,
+		}, err
 	}
 
 	if !res.Ok {
-		return WordEntry{}, errors.New("word not found")
-
+		return WordEntry{
+			Word:        word,
+			Suggestions: res.Suggestions,
+		}, errors.New("word not found")
 	}
+
 	return res.Data, nil
 }
 
@@ -82,9 +88,10 @@ func (c *Client) Daily(ctx context.Context) (string, error) {
 }
 
 type ApiResponse[T any] struct {
-	Ok   bool   `json:"ok"`
-	Data T      `json:"data"`
-	Err  string `json:"error"`
+	Ok          bool     `json:"ok"`
+	Data        T        `json:"data"`
+	Err         string   `json:"error"`
+	Suggestions []string `json:"suggestions"`
 }
 
 type WordEntryResponse = ApiResponse[WordEntry]
@@ -103,7 +110,7 @@ func GetWord(
 		Method(http.MethodGet).
 		Header("User-Agent", fmt.Sprintf("rae-api/%s See https://rae-api.com", version), false).
 		ParseJSON().
-		ExpectedStatusCodes(http.StatusOK)
+		ExpectedStatusCodes(http.StatusOK, http.StatusNotFound)
 
 	err := call.CallEndpoint(ctx, raeApi)
 
