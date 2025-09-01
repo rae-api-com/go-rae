@@ -1,5 +1,7 @@
 package rae
 
+//go:generate easyjson
+
 type WordCategory string
 
 const (
@@ -157,8 +159,9 @@ type Conjugations struct {
 
 //easyjson:json
 type WordEntry struct {
-	Word     string    `json:"word"`
-	Meanings []Meaning `json:"meanings"`
+	Word        string    `json:"word"`
+	Meanings    []Meaning `json:"meanings"`
+	Suggestions []string  `json:"suggestions"`
 }
 
 //easyjson:json
