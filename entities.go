@@ -1,5 +1,11 @@
 package rae
 
+import (
+	"encoding/json"
+
+	"github.com/sonirico/vago/zero"
+)
+
 //go:generate easyjson
 
 type WordCategory string
@@ -200,4 +206,24 @@ type Meaning struct {
 	Origin       *Origin       `json:"origin,omitempty"`
 	Definitions  []Definition  `json:"senses"`
 	Conjugations *Conjugations `json:"conjugations,omitempty"`
+}
+
+type doc struct {
+	Word string `json:"id"`
+	Raw  string `json:"raw"`
+}
+
+//easyjson:json
+type SearchResult struct {
+	Doc  doc `json:"doc"`
+	Hits int `json:"hits"`
+}
+
+func (sr *SearchResult) WordEntry() (*WordEntry, error) {
+	var entry WordEntry
+	err := json.Unmarshal(zero.S2B(sr.Doc.Raw), &entry)
+	if err != nil {
+		return nil, err
+	}
+	return &entry, nil
 }

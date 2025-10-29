@@ -2,7 +2,6 @@ package rae
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -87,6 +86,19 @@ func (c *Client) Daily(ctx context.Context) (string, error) {
 	return res.Data.Word, nil
 }
 
+func (c *Client) Search(ctx context.Context, terms string) ([]SearchResult, error) {
+	ctx, cancel := context.WithTimeout(ctx, c.timeout)
+	defer cancel()
+
+	res, err := GetSearch(ctx, c.version, terms)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
+}
+
 type ApiResponse[T any] struct {
 	Ok          bool     `json:"ok"`
 	Data        T        `json:"data"`
@@ -155,35 +167,16 @@ func GetRandom(
 	return call.BodyParsed, err
 }
 
-type searchResponseDoc struct {
-	Word string `json:"id"`
-	Raw  string `json:"raw"`
-}
-
-type searchResponse struct {
-	Doc  searchResponseDoc `json:"doc"`
-	Hits int               `json:"hits"`
-}
-
 func GetSearch(
 	ctx context.Context,
 	version string,
-	engine string,
 	terms string,
-) ([]WordEntry, error) {
+) ([]SearchResult, error) {
 	terms = url.QueryEscape(terms)
-	uri := fmt.Sprintf("/search?q=%s", terms)
-	if engine != "" {
-		uri += fmt.Sprintf("&eng=%s", engine)
-	}
 
-	call := withttp.NewCall[[]searchResponse](withttp.Fasthttp()).
+	call := withttp.NewCall[[]SearchResult](withttp.Fasthttp()).
 		URI("/search").
 		Query("q", terms)
-
-	if engine != "" {
-		call = call.Query("eng", engine)
-	}
 
 	call.Method(http.MethodGet).
 		Header("User-Agent", fmt.Sprintf("rae-api/%s See https://rae-api.com", version), false).
@@ -196,16 +189,5 @@ func GetSearch(
 		return nil, errors.Wrapf(err, "failed to search for terms %s", terms)
 	}
 
-	res := make([]WordEntry, 0, len(call.BodyParsed))
-
-	for _, hit := range call.BodyParsed {
-		var doc WordEntry
-		if err := json.Unmarshal([]byte(hit.Doc.Raw), &doc); err != nil {
-			return nil, errors.Wrapf(err, "failed to unmarshal doc %s", hit.Doc.Word)
-		}
-		doc.Word = hit.Doc.Word
-		res = append(res, doc)
-	}
-
-	return res, nil
+	return call.BodyParsed, nil
 }
