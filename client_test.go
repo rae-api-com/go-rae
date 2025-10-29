@@ -18,6 +18,14 @@ func TestDaily(t *testing.T) {
 }
 
 func TestSearch(t *testing.T) {
+	res, err := GetSearch(context.Background(), "dev", "perro")
+	if err != nil {
+		t.Fatal(err)
+	}
 
-	t.Log(GetSearch(context.Background(), "dev", "", "perro"))
+	t.Logf("Hits: %d", len(res))
+	for _, r := range res {
+		t.Log(r.Doc.Word)
+		t.Log(r.WordEntry())
+	}
 }
