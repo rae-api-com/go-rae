@@ -36,10 +36,7 @@ func (c *Client) Word(ctx context.Context, word string) (WordEntry, error) {
 	res, err := GetWord(ctx, c.version, word)
 
 	if err != nil {
-		return WordEntry{
-			Word:        word,
-			Suggestions: res.Suggestions,
-		}, err
+		return WordEntry{}, err
 	}
 
 	if !res.Ok {
