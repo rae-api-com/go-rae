@@ -1,13 +1,11 @@
 module github.com/rae-api-com/go-rae
 
-go 1.23.0
-
-toolchain go1.23.6
+go 1.25.3
 
 require (
 	github.com/mailru/easyjson v0.9.1
 	github.com/pkg/errors v0.9.1
-	github.com/sonirico/vago v0.9.0
+	github.com/sonirico/vago v0.10.0
 	github.com/sonirico/withttp v0.9.0
 )
 
