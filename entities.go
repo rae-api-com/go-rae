@@ -109,8 +109,10 @@ type Definition struct {
 	Description     string        `json:"description"`
 	Examples        []string      `json:"examples,omitempty"`
 	CrossReferences []string      `json:"cross_references,omitempty"`
-	Synonyms        []RelatedWord `json:"synonyms"`
-	Antonyms        []RelatedWord `json:"antonyms"`
+	Synonyms        []string      `json:"synonyms"`
+	Antonyms        []string      `json:"antonyms"`
+	SynonymsV2      []RelatedWord `json:"synonyms_v2,omitempty"`
+	AntonymsV2      []RelatedWord `json:"antonyms_v2,omitempty"`
 }
 
 type Origin struct {

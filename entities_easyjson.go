@@ -892,19 +892,19 @@ func easyjson3e8ab7adDecodeGithubComRaeApiComGoRae7(in *jlexer.Lexer, out *Defin
 				in.Delim('[')
 				if out.Synonyms == nil {
 					if !in.IsDelim(']') {
-						out.Synonyms = make([]RelatedWord, 0, 2)
+						out.Synonyms = make([]string, 0, 4)
 					} else {
-						out.Synonyms = []RelatedWord{}
+						out.Synonyms = []string{}
 					}
 				} else {
 					out.Synonyms = (out.Synonyms)[:0]
 				}
 				for !in.IsDelim(']') {
-					var v18 RelatedWord
+					var v18 string
 					if in.IsNull() {
 						in.Skip()
 					} else {
-						(v18).UnmarshalEasyJSON(in)
+						v18 = string(in.String())
 					}
 					out.Synonyms = append(out.Synonyms, v18)
 					in.WantComma()
@@ -919,21 +919,75 @@ func easyjson3e8ab7adDecodeGithubComRaeApiComGoRae7(in *jlexer.Lexer, out *Defin
 				in.Delim('[')
 				if out.Antonyms == nil {
 					if !in.IsDelim(']') {
-						out.Antonyms = make([]RelatedWord, 0, 2)
+						out.Antonyms = make([]string, 0, 4)
 					} else {
-						out.Antonyms = []RelatedWord{}
+						out.Antonyms = []string{}
 					}
 				} else {
 					out.Antonyms = (out.Antonyms)[:0]
 				}
 				for !in.IsDelim(']') {
-					var v19 RelatedWord
+					var v19 string
 					if in.IsNull() {
 						in.Skip()
 					} else {
-						(v19).UnmarshalEasyJSON(in)
+						v19 = string(in.String())
 					}
 					out.Antonyms = append(out.Antonyms, v19)
+					in.WantComma()
+				}
+				in.Delim(']')
+			}
+		case "synonyms_v2":
+			if in.IsNull() {
+				in.Skip()
+				out.SynonymsV2 = nil
+			} else {
+				in.Delim('[')
+				if out.SynonymsV2 == nil {
+					if !in.IsDelim(']') {
+						out.SynonymsV2 = make([]RelatedWord, 0, 2)
+					} else {
+						out.SynonymsV2 = []RelatedWord{}
+					}
+				} else {
+					out.SynonymsV2 = (out.SynonymsV2)[:0]
+				}
+				for !in.IsDelim(']') {
+					var v20 RelatedWord
+					if in.IsNull() {
+						in.Skip()
+					} else {
+						(v20).UnmarshalEasyJSON(in)
+					}
+					out.SynonymsV2 = append(out.SynonymsV2, v20)
+					in.WantComma()
+				}
+				in.Delim(']')
+			}
+		case "antonyms_v2":
+			if in.IsNull() {
+				in.Skip()
+				out.AntonymsV2 = nil
+			} else {
+				in.Delim('[')
+				if out.AntonymsV2 == nil {
+					if !in.IsDelim(']') {
+						out.AntonymsV2 = make([]RelatedWord, 0, 2)
+					} else {
+						out.AntonymsV2 = []RelatedWord{}
+					}
+				} else {
+					out.AntonymsV2 = (out.AntonymsV2)[:0]
+				}
+				for !in.IsDelim(']') {
+					var v21 RelatedWord
+					if in.IsNull() {
+						in.Skip()
+					} else {
+						(v21).UnmarshalEasyJSON(in)
+					}
+					out.AntonymsV2 = append(out.AntonymsV2, v21)
 					in.WantComma()
 				}
 				in.Delim(']')
@@ -997,11 +1051,11 @@ func easyjson3e8ab7adEncodeGithubComRaeApiComGoRae7(out *jwriter.Writer, in Defi
 		out.RawString(prefix)
 		{
 			out.RawByte('[')
-			for v20, v21 := range in.Examples {
-				if v20 > 0 {
+			for v22, v23 := range in.Examples {
+				if v22 > 0 {
 					out.RawByte(',')
 				}
-				out.String(string(v21))
+				out.String(string(v23))
 			}
 			out.RawByte(']')
 		}
@@ -1011,11 +1065,11 @@ func easyjson3e8ab7adEncodeGithubComRaeApiComGoRae7(out *jwriter.Writer, in Defi
 		out.RawString(prefix)
 		{
 			out.RawByte('[')
-			for v22, v23 := range in.CrossReferences {
-				if v22 > 0 {
+			for v24, v25 := range in.CrossReferences {
+				if v24 > 0 {
 					out.RawByte(',')
 				}
-				out.String(string(v23))
+				out.String(string(v25))
 			}
 			out.RawByte(']')
 		}
@@ -1027,11 +1081,11 @@ func easyjson3e8ab7adEncodeGithubComRaeApiComGoRae7(out *jwriter.Writer, in Defi
 			out.RawString("null")
 		} else {
 			out.RawByte('[')
-			for v24, v25 := range in.Synonyms {
-				if v24 > 0 {
+			for v26, v27 := range in.Synonyms {
+				if v26 > 0 {
 					out.RawByte(',')
 				}
-				(v25).MarshalEasyJSON(out)
+				out.String(string(v27))
 			}
 			out.RawByte(']')
 		}
@@ -1043,11 +1097,39 @@ func easyjson3e8ab7adEncodeGithubComRaeApiComGoRae7(out *jwriter.Writer, in Defi
 			out.RawString("null")
 		} else {
 			out.RawByte('[')
-			for v26, v27 := range in.Antonyms {
-				if v26 > 0 {
+			for v28, v29 := range in.Antonyms {
+				if v28 > 0 {
 					out.RawByte(',')
 				}
-				(v27).MarshalEasyJSON(out)
+				out.String(string(v29))
+			}
+			out.RawByte(']')
+		}
+	}
+	if len(in.SynonymsV2) != 0 {
+		const prefix string = ",\"synonyms_v2\":"
+		out.RawString(prefix)
+		{
+			out.RawByte('[')
+			for v30, v31 := range in.SynonymsV2 {
+				if v30 > 0 {
+					out.RawByte(',')
+				}
+				(v31).MarshalEasyJSON(out)
+			}
+			out.RawByte(']')
+		}
+	}
+	if len(in.AntonymsV2) != 0 {
+		const prefix string = ",\"antonyms_v2\":"
+		out.RawString(prefix)
+		{
+			out.RawByte('[')
+			for v32, v33 := range in.AntonymsV2 {
+				if v32 > 0 {
+					out.RawByte(',')
+				}
+				(v33).MarshalEasyJSON(out)
 			}
 			out.RawByte(']')
 		}
