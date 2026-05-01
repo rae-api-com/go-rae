@@ -30,14 +30,13 @@ func easyjson3e8ab7adDecodeGithubComRaeApiComGoRae(in *jlexer.Lexer, out *WordEn
 	for !in.IsDelim('}') {
 		key := in.UnsafeFieldName(false)
 		in.WantColon()
-		if in.IsNull() {
-			in.Skip()
-			in.WantComma()
-			continue
-		}
 		switch key {
 		case "word":
-			out.Word = string(in.String())
+			if in.IsNull() {
+				in.Skip()
+			} else {
+				out.Word = string(in.String())
+			}
 		case "meanings":
 			if in.IsNull() {
 				in.Skip()
@@ -46,7 +45,7 @@ func easyjson3e8ab7adDecodeGithubComRaeApiComGoRae(in *jlexer.Lexer, out *WordEn
 				in.Delim('[')
 				if out.Meanings == nil {
 					if !in.IsDelim(']') {
-						out.Meanings = make([]Meaning, 0, 1)
+						out.Meanings = make([]Meaning, 0, 0)
 					} else {
 						out.Meanings = []Meaning{}
 					}
@@ -55,7 +54,11 @@ func easyjson3e8ab7adDecodeGithubComRaeApiComGoRae(in *jlexer.Lexer, out *WordEn
 				}
 				for !in.IsDelim(']') {
 					var v1 Meaning
-					(v1).UnmarshalEasyJSON(in)
+					if in.IsNull() {
+						in.Skip()
+					} else {
+						(v1).UnmarshalEasyJSON(in)
+					}
 					out.Meanings = append(out.Meanings, v1)
 					in.WantComma()
 				}
@@ -78,7 +81,11 @@ func easyjson3e8ab7adDecodeGithubComRaeApiComGoRae(in *jlexer.Lexer, out *WordEn
 				}
 				for !in.IsDelim(']') {
 					var v2 string
-					v2 = string(in.String())
+					if in.IsNull() {
+						in.Skip()
+					} else {
+						v2 = string(in.String())
+					}
 					out.Suggestions = append(out.Suggestions, v2)
 					in.WantComma()
 				}
@@ -174,16 +181,15 @@ func easyjson3e8ab7adDecodeGithubComRaeApiComGoRae1(in *jlexer.Lexer, out *Searc
 	for !in.IsDelim('}') {
 		key := in.UnsafeFieldName(false)
 		in.WantColon()
-		if in.IsNull() {
-			in.Skip()
-			in.WantComma()
-			continue
-		}
 		switch key {
 		case "doc":
 			easyjson3e8ab7adDecodeGithubComRaeApiComGoRae2(in, &out.Doc)
 		case "hits":
-			out.Hits = int(in.Int())
+			if in.IsNull() {
+				in.Skip()
+			} else {
+				out.Hits = int(in.Int())
+			}
 		default:
 			in.SkipRecursive()
 		}
@@ -247,16 +253,19 @@ func easyjson3e8ab7adDecodeGithubComRaeApiComGoRae2(in *jlexer.Lexer, out *doc) 
 	for !in.IsDelim('}') {
 		key := in.UnsafeFieldName(false)
 		in.WantColon()
-		if in.IsNull() {
-			in.Skip()
-			in.WantComma()
-			continue
-		}
 		switch key {
 		case "id":
-			out.Word = string(in.String())
+			if in.IsNull() {
+				in.Skip()
+			} else {
+				out.Word = string(in.String())
+			}
 		case "raw":
-			out.Raw = string(in.String())
+			if in.IsNull() {
+				in.Skip()
+			} else {
+				out.Raw = string(in.String())
+			}
 		default:
 			in.SkipRecursive()
 		}
@@ -283,7 +292,7 @@ func easyjson3e8ab7adEncodeGithubComRaeApiComGoRae2(out *jwriter.Writer, in doc)
 	}
 	out.RawByte('}')
 }
-func easyjson3e8ab7adDecodeGithubComRaeApiComGoRae3(in *jlexer.Lexer, out *Meaning) {
+func easyjson3e8ab7adDecodeGithubComRaeApiComGoRae3(in *jlexer.Lexer, out *RelatedWord) {
 	isTopLevel := in.IsStart()
 	if in.IsNull() {
 		if isTopLevel {
@@ -296,12 +305,89 @@ func easyjson3e8ab7adDecodeGithubComRaeApiComGoRae3(in *jlexer.Lexer, out *Meani
 	for !in.IsDelim('}') {
 		key := in.UnsafeFieldName(false)
 		in.WantColon()
-		if in.IsNull() {
-			in.Skip()
-			in.WantComma()
-			continue
-		}
 		switch key {
+		case "word":
+			if in.IsNull() {
+				in.Skip()
+			} else {
+				out.Word = string(in.String())
+			}
+		case "label":
+			if in.IsNull() {
+				in.Skip()
+			} else {
+				out.Label = string(in.String())
+			}
+		default:
+			in.SkipRecursive()
+		}
+		in.WantComma()
+	}
+	in.Delim('}')
+	if isTopLevel {
+		in.Consumed()
+	}
+}
+func easyjson3e8ab7adEncodeGithubComRaeApiComGoRae3(out *jwriter.Writer, in RelatedWord) {
+	out.RawByte('{')
+	first := true
+	_ = first
+	{
+		const prefix string = ",\"word\":"
+		out.RawString(prefix[1:])
+		out.String(string(in.Word))
+	}
+	if in.Label != "" {
+		const prefix string = ",\"label\":"
+		out.RawString(prefix)
+		out.String(string(in.Label))
+	}
+	out.RawByte('}')
+}
+
+// MarshalJSON supports json.Marshaler interface
+func (v RelatedWord) MarshalJSON() ([]byte, error) {
+	w := jwriter.Writer{}
+	easyjson3e8ab7adEncodeGithubComRaeApiComGoRae3(&w, v)
+	return w.Buffer.BuildBytes(), w.Error
+}
+
+// MarshalEasyJSON supports easyjson.Marshaler interface
+func (v RelatedWord) MarshalEasyJSON(w *jwriter.Writer) {
+	easyjson3e8ab7adEncodeGithubComRaeApiComGoRae3(w, v)
+}
+
+// UnmarshalJSON supports json.Unmarshaler interface
+func (v *RelatedWord) UnmarshalJSON(data []byte) error {
+	r := jlexer.Lexer{Data: data}
+	easyjson3e8ab7adDecodeGithubComRaeApiComGoRae3(&r, v)
+	return r.Error()
+}
+
+// UnmarshalEasyJSON supports easyjson.Unmarshaler interface
+func (v *RelatedWord) UnmarshalEasyJSON(l *jlexer.Lexer) {
+	easyjson3e8ab7adDecodeGithubComRaeApiComGoRae3(l, v)
+}
+func easyjson3e8ab7adDecodeGithubComRaeApiComGoRae4(in *jlexer.Lexer, out *Meaning) {
+	isTopLevel := in.IsStart()
+	if in.IsNull() {
+		if isTopLevel {
+			in.Consumed()
+		}
+		in.Skip()
+		return
+	}
+	in.Delim('{')
+	for !in.IsDelim('}') {
+		key := in.UnsafeFieldName(false)
+		in.WantColon()
+		switch key {
+		case "homonym_index":
+			if in.IsNull() {
+				in.Skip()
+			} else {
+				out.HomonymIndex = int(in.Int())
+			}
 		case "origin":
 			if in.IsNull() {
 				in.Skip()
@@ -310,7 +396,7 @@ func easyjson3e8ab7adDecodeGithubComRaeApiComGoRae3(in *jlexer.Lexer, out *Meani
 				if out.Origin == nil {
 					out.Origin = new(Origin)
 				}
-				easyjson3e8ab7adDecodeGithubComRaeApiComGoRae4(in, out.Origin)
+				easyjson3e8ab7adDecodeGithubComRaeApiComGoRae5(in, out.Origin)
 			}
 		case "senses":
 			if in.IsNull() {
@@ -329,8 +415,39 @@ func easyjson3e8ab7adDecodeGithubComRaeApiComGoRae3(in *jlexer.Lexer, out *Meani
 				}
 				for !in.IsDelim(']') {
 					var v7 Definition
-					(v7).UnmarshalEasyJSON(in)
+					if in.IsNull() {
+						in.Skip()
+					} else {
+						(v7).UnmarshalEasyJSON(in)
+					}
 					out.Definitions = append(out.Definitions, v7)
+					in.WantComma()
+				}
+				in.Delim(']')
+			}
+		case "locutions":
+			if in.IsNull() {
+				in.Skip()
+				out.Locutions = nil
+			} else {
+				in.Delim('[')
+				if out.Locutions == nil {
+					if !in.IsDelim(']') {
+						out.Locutions = make([]Locution, 0, 1)
+					} else {
+						out.Locutions = []Locution{}
+					}
+				} else {
+					out.Locutions = (out.Locutions)[:0]
+				}
+				for !in.IsDelim(']') {
+					var v8 Locution
+					if in.IsNull() {
+						in.Skip()
+					} else {
+						(v8).UnmarshalEasyJSON(in)
+					}
+					out.Locutions = append(out.Locutions, v8)
 					in.WantComma()
 				}
 				in.Delim(']')
@@ -343,7 +460,11 @@ func easyjson3e8ab7adDecodeGithubComRaeApiComGoRae3(in *jlexer.Lexer, out *Meani
 				if out.Conjugations == nil {
 					out.Conjugations = new(Conjugations)
 				}
-				(*out.Conjugations).UnmarshalEasyJSON(in)
+				if in.IsNull() {
+					in.Skip()
+				} else {
+					(*out.Conjugations).UnmarshalEasyJSON(in)
+				}
 			}
 		default:
 			in.SkipRecursive()
@@ -355,15 +476,25 @@ func easyjson3e8ab7adDecodeGithubComRaeApiComGoRae3(in *jlexer.Lexer, out *Meani
 		in.Consumed()
 	}
 }
-func easyjson3e8ab7adEncodeGithubComRaeApiComGoRae3(out *jwriter.Writer, in Meaning) {
+func easyjson3e8ab7adEncodeGithubComRaeApiComGoRae4(out *jwriter.Writer, in Meaning) {
 	out.RawByte('{')
 	first := true
 	_ = first
-	if in.Origin != nil {
-		const prefix string = ",\"origin\":"
+	if in.HomonymIndex != 0 {
+		const prefix string = ",\"homonym_index\":"
 		first = false
 		out.RawString(prefix[1:])
-		easyjson3e8ab7adEncodeGithubComRaeApiComGoRae4(out, *in.Origin)
+		out.Int(int(in.HomonymIndex))
+	}
+	if in.Origin != nil {
+		const prefix string = ",\"origin\":"
+		if first {
+			first = false
+			out.RawString(prefix[1:])
+		} else {
+			out.RawString(prefix)
+		}
+		easyjson3e8ab7adEncodeGithubComRaeApiComGoRae5(out, *in.Origin)
 	}
 	{
 		const prefix string = ",\"senses\":"
@@ -377,11 +508,25 @@ func easyjson3e8ab7adEncodeGithubComRaeApiComGoRae3(out *jwriter.Writer, in Mean
 			out.RawString("null")
 		} else {
 			out.RawByte('[')
-			for v8, v9 := range in.Definitions {
-				if v8 > 0 {
+			for v9, v10 := range in.Definitions {
+				if v9 > 0 {
 					out.RawByte(',')
 				}
-				(v9).MarshalEasyJSON(out)
+				(v10).MarshalEasyJSON(out)
+			}
+			out.RawByte(']')
+		}
+	}
+	if len(in.Locutions) != 0 {
+		const prefix string = ",\"locutions\":"
+		out.RawString(prefix)
+		{
+			out.RawByte('[')
+			for v11, v12 := range in.Locutions {
+				if v11 > 0 {
+					out.RawByte(',')
+				}
+				(v12).MarshalEasyJSON(out)
 			}
 			out.RawByte(']')
 		}
@@ -397,27 +542,27 @@ func easyjson3e8ab7adEncodeGithubComRaeApiComGoRae3(out *jwriter.Writer, in Mean
 // MarshalJSON supports json.Marshaler interface
 func (v Meaning) MarshalJSON() ([]byte, error) {
 	w := jwriter.Writer{}
-	easyjson3e8ab7adEncodeGithubComRaeApiComGoRae3(&w, v)
+	easyjson3e8ab7adEncodeGithubComRaeApiComGoRae4(&w, v)
 	return w.Buffer.BuildBytes(), w.Error
 }
 
 // MarshalEasyJSON supports easyjson.Marshaler interface
 func (v Meaning) MarshalEasyJSON(w *jwriter.Writer) {
-	easyjson3e8ab7adEncodeGithubComRaeApiComGoRae3(w, v)
+	easyjson3e8ab7adEncodeGithubComRaeApiComGoRae4(w, v)
 }
 
 // UnmarshalJSON supports json.Unmarshaler interface
 func (v *Meaning) UnmarshalJSON(data []byte) error {
 	r := jlexer.Lexer{Data: data}
-	easyjson3e8ab7adDecodeGithubComRaeApiComGoRae3(&r, v)
+	easyjson3e8ab7adDecodeGithubComRaeApiComGoRae4(&r, v)
 	return r.Error()
 }
 
 // UnmarshalEasyJSON supports easyjson.Unmarshaler interface
 func (v *Meaning) UnmarshalEasyJSON(l *jlexer.Lexer) {
-	easyjson3e8ab7adDecodeGithubComRaeApiComGoRae3(l, v)
+	easyjson3e8ab7adDecodeGithubComRaeApiComGoRae4(l, v)
 }
-func easyjson3e8ab7adDecodeGithubComRaeApiComGoRae4(in *jlexer.Lexer, out *Origin) {
+func easyjson3e8ab7adDecodeGithubComRaeApiComGoRae5(in *jlexer.Lexer, out *Origin) {
 	isTopLevel := in.IsStart()
 	if in.IsNull() {
 		if isTopLevel {
@@ -430,20 +575,31 @@ func easyjson3e8ab7adDecodeGithubComRaeApiComGoRae4(in *jlexer.Lexer, out *Origi
 	for !in.IsDelim('}') {
 		key := in.UnsafeFieldName(false)
 		in.WantColon()
-		if in.IsNull() {
-			in.Skip()
-			in.WantComma()
-			continue
-		}
 		switch key {
 		case "raw":
-			out.Raw = string(in.String())
+			if in.IsNull() {
+				in.Skip()
+			} else {
+				out.Raw = string(in.String())
+			}
 		case "type":
-			out.Type = OriginType(in.String())
+			if in.IsNull() {
+				in.Skip()
+			} else {
+				out.Type = OriginType(in.String())
+			}
 		case "voice":
-			out.Voice = VoiceType(in.String())
+			if in.IsNull() {
+				in.Skip()
+			} else {
+				out.Voice = VoiceType(in.String())
+			}
 		case "text":
-			out.Text = string(in.String())
+			if in.IsNull() {
+				in.Skip()
+			} else {
+				out.Text = string(in.String())
+			}
 		default:
 			in.SkipRecursive()
 		}
@@ -454,7 +610,7 @@ func easyjson3e8ab7adDecodeGithubComRaeApiComGoRae4(in *jlexer.Lexer, out *Origi
 		in.Consumed()
 	}
 }
-func easyjson3e8ab7adEncodeGithubComRaeApiComGoRae4(out *jwriter.Writer, in Origin) {
+func easyjson3e8ab7adEncodeGithubComRaeApiComGoRae5(out *jwriter.Writer, in Origin) {
 	out.RawByte('{')
 	first := true
 	_ = first
@@ -480,7 +636,7 @@ func easyjson3e8ab7adEncodeGithubComRaeApiComGoRae4(out *jwriter.Writer, in Orig
 	}
 	out.RawByte('}')
 }
-func easyjson3e8ab7adDecodeGithubComRaeApiComGoRae5(in *jlexer.Lexer, out *Locution) {
+func easyjson3e8ab7adDecodeGithubComRaeApiComGoRae6(in *jlexer.Lexer, out *Locution) {
 	isTopLevel := in.IsStart()
 	if in.IsNull() {
 		if isTopLevel {
@@ -493,16 +649,40 @@ func easyjson3e8ab7adDecodeGithubComRaeApiComGoRae5(in *jlexer.Lexer, out *Locut
 	for !in.IsDelim('}') {
 		key := in.UnsafeFieldName(false)
 		in.WantColon()
-		if in.IsNull() {
-			in.Skip()
-			in.WantComma()
-			continue
-		}
 		switch key {
-		case "text":
-			out.Text = string(in.String())
-		case "definition":
-			out.Definition = string(in.String())
+		case "expression":
+			if in.IsNull() {
+				in.Skip()
+			} else {
+				out.Expression = string(in.String())
+			}
+		case "senses":
+			if in.IsNull() {
+				in.Skip()
+				out.Senses = nil
+			} else {
+				in.Delim('[')
+				if out.Senses == nil {
+					if !in.IsDelim(']') {
+						out.Senses = make([]Definition, 0, 0)
+					} else {
+						out.Senses = []Definition{}
+					}
+				} else {
+					out.Senses = (out.Senses)[:0]
+				}
+				for !in.IsDelim(']') {
+					var v13 Definition
+					if in.IsNull() {
+						in.Skip()
+					} else {
+						(v13).UnmarshalEasyJSON(in)
+					}
+					out.Senses = append(out.Senses, v13)
+					in.WantComma()
+				}
+				in.Delim(']')
+			}
 		default:
 			in.SkipRecursive()
 		}
@@ -513,19 +693,30 @@ func easyjson3e8ab7adDecodeGithubComRaeApiComGoRae5(in *jlexer.Lexer, out *Locut
 		in.Consumed()
 	}
 }
-func easyjson3e8ab7adEncodeGithubComRaeApiComGoRae5(out *jwriter.Writer, in Locution) {
+func easyjson3e8ab7adEncodeGithubComRaeApiComGoRae6(out *jwriter.Writer, in Locution) {
 	out.RawByte('{')
 	first := true
 	_ = first
 	{
-		const prefix string = ",\"text\":"
+		const prefix string = ",\"expression\":"
 		out.RawString(prefix[1:])
-		out.String(string(in.Text))
+		out.String(string(in.Expression))
 	}
 	{
-		const prefix string = ",\"definition\":"
+		const prefix string = ",\"senses\":"
 		out.RawString(prefix)
-		out.String(string(in.Definition))
+		if in.Senses == nil && (out.Flags&jwriter.NilSliceAsEmpty) == 0 {
+			out.RawString("null")
+		} else {
+			out.RawByte('[')
+			for v14, v15 := range in.Senses {
+				if v14 > 0 {
+					out.RawByte(',')
+				}
+				(v15).MarshalEasyJSON(out)
+			}
+			out.RawByte(']')
+		}
 	}
 	out.RawByte('}')
 }
@@ -533,27 +724,27 @@ func easyjson3e8ab7adEncodeGithubComRaeApiComGoRae5(out *jwriter.Writer, in Locu
 // MarshalJSON supports json.Marshaler interface
 func (v Locution) MarshalJSON() ([]byte, error) {
 	w := jwriter.Writer{}
-	easyjson3e8ab7adEncodeGithubComRaeApiComGoRae5(&w, v)
+	easyjson3e8ab7adEncodeGithubComRaeApiComGoRae6(&w, v)
 	return w.Buffer.BuildBytes(), w.Error
 }
 
 // MarshalEasyJSON supports easyjson.Marshaler interface
 func (v Locution) MarshalEasyJSON(w *jwriter.Writer) {
-	easyjson3e8ab7adEncodeGithubComRaeApiComGoRae5(w, v)
+	easyjson3e8ab7adEncodeGithubComRaeApiComGoRae6(w, v)
 }
 
 // UnmarshalJSON supports json.Unmarshaler interface
 func (v *Locution) UnmarshalJSON(data []byte) error {
 	r := jlexer.Lexer{Data: data}
-	easyjson3e8ab7adDecodeGithubComRaeApiComGoRae5(&r, v)
+	easyjson3e8ab7adDecodeGithubComRaeApiComGoRae6(&r, v)
 	return r.Error()
 }
 
 // UnmarshalEasyJSON supports easyjson.Unmarshaler interface
 func (v *Locution) UnmarshalEasyJSON(l *jlexer.Lexer) {
-	easyjson3e8ab7adDecodeGithubComRaeApiComGoRae5(l, v)
+	easyjson3e8ab7adDecodeGithubComRaeApiComGoRae6(l, v)
 }
-func easyjson3e8ab7adDecodeGithubComRaeApiComGoRae6(in *jlexer.Lexer, out *Definition) {
+func easyjson3e8ab7adDecodeGithubComRaeApiComGoRae7(in *jlexer.Lexer, out *Definition) {
 	isTopLevel := in.IsStart()
 	if in.IsNull() {
 		if isTopLevel {
@@ -566,18 +757,25 @@ func easyjson3e8ab7adDecodeGithubComRaeApiComGoRae6(in *jlexer.Lexer, out *Defin
 	for !in.IsDelim('}') {
 		key := in.UnsafeFieldName(false)
 		in.WantColon()
-		if in.IsNull() {
-			in.Skip()
-			in.WantComma()
-			continue
-		}
 		switch key {
 		case "raw":
-			out.Raw = string(in.String())
+			if in.IsNull() {
+				in.Skip()
+			} else {
+				out.Raw = string(in.String())
+			}
 		case "meaning_number":
-			out.MeaningNumber = int(in.Int())
+			if in.IsNull() {
+				in.Skip()
+			} else {
+				out.MeaningNumber = int(in.Int())
+			}
 		case "category":
-			out.Category = WordCategory(in.String())
+			if in.IsNull() {
+				in.Skip()
+			} else {
+				out.Category = WordCategory(in.String())
+			}
 		case "verb_category":
 			if in.IsNull() {
 				in.Skip()
@@ -586,7 +784,11 @@ func easyjson3e8ab7adDecodeGithubComRaeApiComGoRae6(in *jlexer.Lexer, out *Defin
 				if out.VerbCategory == nil {
 					out.VerbCategory = new(VerbCategory)
 				}
-				*out.VerbCategory = VerbCategory(in.String())
+				if in.IsNull() {
+					in.Skip()
+				} else {
+					*out.VerbCategory = VerbCategory(in.String())
+				}
 			}
 		case "gender":
 			if in.IsNull() {
@@ -596,7 +798,11 @@ func easyjson3e8ab7adDecodeGithubComRaeApiComGoRae6(in *jlexer.Lexer, out *Defin
 				if out.Gender == nil {
 					out.Gender = new(Gender)
 				}
-				*out.Gender = Gender(in.String())
+				if in.IsNull() {
+					in.Skip()
+				} else {
+					*out.Gender = Gender(in.String())
+				}
 			}
 		case "article":
 			if in.IsNull() {
@@ -606,12 +812,78 @@ func easyjson3e8ab7adDecodeGithubComRaeApiComGoRae6(in *jlexer.Lexer, out *Defin
 				if out.Article == nil {
 					out.Article = new(Article)
 				}
-				(*out.Article).UnmarshalEasyJSON(in)
+				if in.IsNull() {
+					in.Skip()
+				} else {
+					(*out.Article).UnmarshalEasyJSON(in)
+				}
 			}
 		case "usage":
-			out.Usage = Usage(in.String())
+			if in.IsNull() {
+				in.Skip()
+			} else {
+				out.Usage = Usage(in.String())
+			}
 		case "description":
-			out.Description = string(in.String())
+			if in.IsNull() {
+				in.Skip()
+			} else {
+				out.Description = string(in.String())
+			}
+		case "examples":
+			if in.IsNull() {
+				in.Skip()
+				out.Examples = nil
+			} else {
+				in.Delim('[')
+				if out.Examples == nil {
+					if !in.IsDelim(']') {
+						out.Examples = make([]string, 0, 4)
+					} else {
+						out.Examples = []string{}
+					}
+				} else {
+					out.Examples = (out.Examples)[:0]
+				}
+				for !in.IsDelim(']') {
+					var v16 string
+					if in.IsNull() {
+						in.Skip()
+					} else {
+						v16 = string(in.String())
+					}
+					out.Examples = append(out.Examples, v16)
+					in.WantComma()
+				}
+				in.Delim(']')
+			}
+		case "cross_references":
+			if in.IsNull() {
+				in.Skip()
+				out.CrossReferences = nil
+			} else {
+				in.Delim('[')
+				if out.CrossReferences == nil {
+					if !in.IsDelim(']') {
+						out.CrossReferences = make([]string, 0, 4)
+					} else {
+						out.CrossReferences = []string{}
+					}
+				} else {
+					out.CrossReferences = (out.CrossReferences)[:0]
+				}
+				for !in.IsDelim(']') {
+					var v17 string
+					if in.IsNull() {
+						in.Skip()
+					} else {
+						v17 = string(in.String())
+					}
+					out.CrossReferences = append(out.CrossReferences, v17)
+					in.WantComma()
+				}
+				in.Delim(']')
+			}
 		case "synonyms":
 			if in.IsNull() {
 				in.Skip()
@@ -620,17 +892,21 @@ func easyjson3e8ab7adDecodeGithubComRaeApiComGoRae6(in *jlexer.Lexer, out *Defin
 				in.Delim('[')
 				if out.Synonyms == nil {
 					if !in.IsDelim(']') {
-						out.Synonyms = make([]string, 0, 4)
+						out.Synonyms = make([]RelatedWord, 0, 2)
 					} else {
-						out.Synonyms = []string{}
+						out.Synonyms = []RelatedWord{}
 					}
 				} else {
 					out.Synonyms = (out.Synonyms)[:0]
 				}
 				for !in.IsDelim(']') {
-					var v10 string
-					v10 = string(in.String())
-					out.Synonyms = append(out.Synonyms, v10)
+					var v18 RelatedWord
+					if in.IsNull() {
+						in.Skip()
+					} else {
+						(v18).UnmarshalEasyJSON(in)
+					}
+					out.Synonyms = append(out.Synonyms, v18)
 					in.WantComma()
 				}
 				in.Delim(']')
@@ -643,17 +919,21 @@ func easyjson3e8ab7adDecodeGithubComRaeApiComGoRae6(in *jlexer.Lexer, out *Defin
 				in.Delim('[')
 				if out.Antonyms == nil {
 					if !in.IsDelim(']') {
-						out.Antonyms = make([]string, 0, 4)
+						out.Antonyms = make([]RelatedWord, 0, 2)
 					} else {
-						out.Antonyms = []string{}
+						out.Antonyms = []RelatedWord{}
 					}
 				} else {
 					out.Antonyms = (out.Antonyms)[:0]
 				}
 				for !in.IsDelim(']') {
-					var v11 string
-					v11 = string(in.String())
-					out.Antonyms = append(out.Antonyms, v11)
+					var v19 RelatedWord
+					if in.IsNull() {
+						in.Skip()
+					} else {
+						(v19).UnmarshalEasyJSON(in)
+					}
+					out.Antonyms = append(out.Antonyms, v19)
 					in.WantComma()
 				}
 				in.Delim(']')
@@ -668,7 +948,7 @@ func easyjson3e8ab7adDecodeGithubComRaeApiComGoRae6(in *jlexer.Lexer, out *Defin
 		in.Consumed()
 	}
 }
-func easyjson3e8ab7adEncodeGithubComRaeApiComGoRae6(out *jwriter.Writer, in Definition) {
+func easyjson3e8ab7adEncodeGithubComRaeApiComGoRae7(out *jwriter.Writer, in Definition) {
 	out.RawByte('{')
 	first := true
 	_ = first
@@ -712,6 +992,34 @@ func easyjson3e8ab7adEncodeGithubComRaeApiComGoRae6(out *jwriter.Writer, in Defi
 		out.RawString(prefix)
 		out.String(string(in.Description))
 	}
+	if len(in.Examples) != 0 {
+		const prefix string = ",\"examples\":"
+		out.RawString(prefix)
+		{
+			out.RawByte('[')
+			for v20, v21 := range in.Examples {
+				if v20 > 0 {
+					out.RawByte(',')
+				}
+				out.String(string(v21))
+			}
+			out.RawByte(']')
+		}
+	}
+	if len(in.CrossReferences) != 0 {
+		const prefix string = ",\"cross_references\":"
+		out.RawString(prefix)
+		{
+			out.RawByte('[')
+			for v22, v23 := range in.CrossReferences {
+				if v22 > 0 {
+					out.RawByte(',')
+				}
+				out.String(string(v23))
+			}
+			out.RawByte(']')
+		}
+	}
 	{
 		const prefix string = ",\"synonyms\":"
 		out.RawString(prefix)
@@ -719,11 +1027,11 @@ func easyjson3e8ab7adEncodeGithubComRaeApiComGoRae6(out *jwriter.Writer, in Defi
 			out.RawString("null")
 		} else {
 			out.RawByte('[')
-			for v12, v13 := range in.Synonyms {
-				if v12 > 0 {
+			for v24, v25 := range in.Synonyms {
+				if v24 > 0 {
 					out.RawByte(',')
 				}
-				out.String(string(v13))
+				(v25).MarshalEasyJSON(out)
 			}
 			out.RawByte(']')
 		}
@@ -735,11 +1043,11 @@ func easyjson3e8ab7adEncodeGithubComRaeApiComGoRae6(out *jwriter.Writer, in Defi
 			out.RawString("null")
 		} else {
 			out.RawByte('[')
-			for v14, v15 := range in.Antonyms {
-				if v14 > 0 {
+			for v26, v27 := range in.Antonyms {
+				if v26 > 0 {
 					out.RawByte(',')
 				}
-				out.String(string(v15))
+				(v27).MarshalEasyJSON(out)
 			}
 			out.RawByte(']')
 		}
@@ -750,27 +1058,27 @@ func easyjson3e8ab7adEncodeGithubComRaeApiComGoRae6(out *jwriter.Writer, in Defi
 // MarshalJSON supports json.Marshaler interface
 func (v Definition) MarshalJSON() ([]byte, error) {
 	w := jwriter.Writer{}
-	easyjson3e8ab7adEncodeGithubComRaeApiComGoRae6(&w, v)
+	easyjson3e8ab7adEncodeGithubComRaeApiComGoRae7(&w, v)
 	return w.Buffer.BuildBytes(), w.Error
 }
 
 // MarshalEasyJSON supports easyjson.Marshaler interface
 func (v Definition) MarshalEasyJSON(w *jwriter.Writer) {
-	easyjson3e8ab7adEncodeGithubComRaeApiComGoRae6(w, v)
+	easyjson3e8ab7adEncodeGithubComRaeApiComGoRae7(w, v)
 }
 
 // UnmarshalJSON supports json.Unmarshaler interface
 func (v *Definition) UnmarshalJSON(data []byte) error {
 	r := jlexer.Lexer{Data: data}
-	easyjson3e8ab7adDecodeGithubComRaeApiComGoRae6(&r, v)
+	easyjson3e8ab7adDecodeGithubComRaeApiComGoRae7(&r, v)
 	return r.Error()
 }
 
 // UnmarshalEasyJSON supports easyjson.Unmarshaler interface
 func (v *Definition) UnmarshalEasyJSON(l *jlexer.Lexer) {
-	easyjson3e8ab7adDecodeGithubComRaeApiComGoRae6(l, v)
+	easyjson3e8ab7adDecodeGithubComRaeApiComGoRae7(l, v)
 }
-func easyjson3e8ab7adDecodeGithubComRaeApiComGoRae7(in *jlexer.Lexer, out *Conjugations) {
+func easyjson3e8ab7adDecodeGithubComRaeApiComGoRae8(in *jlexer.Lexer, out *Conjugations) {
 	isTopLevel := in.IsStart()
 	if in.IsNull() {
 		if isTopLevel {
@@ -783,20 +1091,31 @@ func easyjson3e8ab7adDecodeGithubComRaeApiComGoRae7(in *jlexer.Lexer, out *Conju
 	for !in.IsDelim('}') {
 		key := in.UnsafeFieldName(false)
 		in.WantColon()
-		if in.IsNull() {
-			in.Skip()
-			in.WantComma()
-			continue
-		}
 		switch key {
 		case "non_personal":
-			(out.ConjugationNonPersonal).UnmarshalEasyJSON(in)
+			if in.IsNull() {
+				in.Skip()
+			} else {
+				(out.ConjugationNonPersonal).UnmarshalEasyJSON(in)
+			}
 		case "indicative":
-			(out.ConjugationIndicative).UnmarshalEasyJSON(in)
+			if in.IsNull() {
+				in.Skip()
+			} else {
+				(out.ConjugationIndicative).UnmarshalEasyJSON(in)
+			}
 		case "subjunctive":
-			(out.ConjugationSubjunctive).UnmarshalEasyJSON(in)
+			if in.IsNull() {
+				in.Skip()
+			} else {
+				(out.ConjugationSubjunctive).UnmarshalEasyJSON(in)
+			}
 		case "imperative":
-			(out.ConjugationImperative).UnmarshalEasyJSON(in)
+			if in.IsNull() {
+				in.Skip()
+			} else {
+				(out.ConjugationImperative).UnmarshalEasyJSON(in)
+			}
 		default:
 			in.SkipRecursive()
 		}
@@ -807,7 +1126,7 @@ func easyjson3e8ab7adDecodeGithubComRaeApiComGoRae7(in *jlexer.Lexer, out *Conju
 		in.Consumed()
 	}
 }
-func easyjson3e8ab7adEncodeGithubComRaeApiComGoRae7(out *jwriter.Writer, in Conjugations) {
+func easyjson3e8ab7adEncodeGithubComRaeApiComGoRae8(out *jwriter.Writer, in Conjugations) {
 	out.RawByte('{')
 	first := true
 	_ = first
@@ -837,27 +1156,27 @@ func easyjson3e8ab7adEncodeGithubComRaeApiComGoRae7(out *jwriter.Writer, in Conj
 // MarshalJSON supports json.Marshaler interface
 func (v Conjugations) MarshalJSON() ([]byte, error) {
 	w := jwriter.Writer{}
-	easyjson3e8ab7adEncodeGithubComRaeApiComGoRae7(&w, v)
+	easyjson3e8ab7adEncodeGithubComRaeApiComGoRae8(&w, v)
 	return w.Buffer.BuildBytes(), w.Error
 }
 
 // MarshalEasyJSON supports easyjson.Marshaler interface
 func (v Conjugations) MarshalEasyJSON(w *jwriter.Writer) {
-	easyjson3e8ab7adEncodeGithubComRaeApiComGoRae7(w, v)
+	easyjson3e8ab7adEncodeGithubComRaeApiComGoRae8(w, v)
 }
 
 // UnmarshalJSON supports json.Unmarshaler interface
 func (v *Conjugations) UnmarshalJSON(data []byte) error {
 	r := jlexer.Lexer{Data: data}
-	easyjson3e8ab7adDecodeGithubComRaeApiComGoRae7(&r, v)
+	easyjson3e8ab7adDecodeGithubComRaeApiComGoRae8(&r, v)
 	return r.Error()
 }
 
 // UnmarshalEasyJSON supports easyjson.Unmarshaler interface
 func (v *Conjugations) UnmarshalEasyJSON(l *jlexer.Lexer) {
-	easyjson3e8ab7adDecodeGithubComRaeApiComGoRae7(l, v)
+	easyjson3e8ab7adDecodeGithubComRaeApiComGoRae8(l, v)
 }
-func easyjson3e8ab7adDecodeGithubComRaeApiComGoRae8(in *jlexer.Lexer, out *ConjugationSubjunctive) {
+func easyjson3e8ab7adDecodeGithubComRaeApiComGoRae9(in *jlexer.Lexer, out *ConjugationSubjunctive) {
 	isTopLevel := in.IsStart()
 	if in.IsNull() {
 		if isTopLevel {
@@ -870,24 +1189,43 @@ func easyjson3e8ab7adDecodeGithubComRaeApiComGoRae8(in *jlexer.Lexer, out *Conju
 	for !in.IsDelim('}') {
 		key := in.UnsafeFieldName(false)
 		in.WantColon()
-		if in.IsNull() {
-			in.Skip()
-			in.WantComma()
-			continue
-		}
 		switch key {
 		case "present":
-			(out.Present).UnmarshalEasyJSON(in)
+			if in.IsNull() {
+				in.Skip()
+			} else {
+				(out.Present).UnmarshalEasyJSON(in)
+			}
 		case "present_perfect":
-			(out.PresentPerfect).UnmarshalEasyJSON(in)
+			if in.IsNull() {
+				in.Skip()
+			} else {
+				(out.PresentPerfect).UnmarshalEasyJSON(in)
+			}
 		case "imperfect":
-			(out.Imperfect).UnmarshalEasyJSON(in)
+			if in.IsNull() {
+				in.Skip()
+			} else {
+				(out.Imperfect).UnmarshalEasyJSON(in)
+			}
 		case "past_perfect":
-			(out.PastPerfect).UnmarshalEasyJSON(in)
+			if in.IsNull() {
+				in.Skip()
+			} else {
+				(out.PastPerfect).UnmarshalEasyJSON(in)
+			}
 		case "future":
-			(out.Future).UnmarshalEasyJSON(in)
+			if in.IsNull() {
+				in.Skip()
+			} else {
+				(out.Future).UnmarshalEasyJSON(in)
+			}
 		case "future_perfect":
-			(out.FuturePerfect).UnmarshalEasyJSON(in)
+			if in.IsNull() {
+				in.Skip()
+			} else {
+				(out.FuturePerfect).UnmarshalEasyJSON(in)
+			}
 		default:
 			in.SkipRecursive()
 		}
@@ -898,7 +1236,7 @@ func easyjson3e8ab7adDecodeGithubComRaeApiComGoRae8(in *jlexer.Lexer, out *Conju
 		in.Consumed()
 	}
 }
-func easyjson3e8ab7adEncodeGithubComRaeApiComGoRae8(out *jwriter.Writer, in ConjugationSubjunctive) {
+func easyjson3e8ab7adEncodeGithubComRaeApiComGoRae9(out *jwriter.Writer, in ConjugationSubjunctive) {
 	out.RawByte('{')
 	first := true
 	_ = first
@@ -938,27 +1276,27 @@ func easyjson3e8ab7adEncodeGithubComRaeApiComGoRae8(out *jwriter.Writer, in Conj
 // MarshalJSON supports json.Marshaler interface
 func (v ConjugationSubjunctive) MarshalJSON() ([]byte, error) {
 	w := jwriter.Writer{}
-	easyjson3e8ab7adEncodeGithubComRaeApiComGoRae8(&w, v)
+	easyjson3e8ab7adEncodeGithubComRaeApiComGoRae9(&w, v)
 	return w.Buffer.BuildBytes(), w.Error
 }
 
 // MarshalEasyJSON supports easyjson.Marshaler interface
 func (v ConjugationSubjunctive) MarshalEasyJSON(w *jwriter.Writer) {
-	easyjson3e8ab7adEncodeGithubComRaeApiComGoRae8(w, v)
+	easyjson3e8ab7adEncodeGithubComRaeApiComGoRae9(w, v)
 }
 
 // UnmarshalJSON supports json.Unmarshaler interface
 func (v *ConjugationSubjunctive) UnmarshalJSON(data []byte) error {
 	r := jlexer.Lexer{Data: data}
-	easyjson3e8ab7adDecodeGithubComRaeApiComGoRae8(&r, v)
+	easyjson3e8ab7adDecodeGithubComRaeApiComGoRae9(&r, v)
 	return r.Error()
 }
 
 // UnmarshalEasyJSON supports easyjson.Unmarshaler interface
 func (v *ConjugationSubjunctive) UnmarshalEasyJSON(l *jlexer.Lexer) {
-	easyjson3e8ab7adDecodeGithubComRaeApiComGoRae8(l, v)
+	easyjson3e8ab7adDecodeGithubComRaeApiComGoRae9(l, v)
 }
-func easyjson3e8ab7adDecodeGithubComRaeApiComGoRae9(in *jlexer.Lexer, out *ConjugationNonPersonal) {
+func easyjson3e8ab7adDecodeGithubComRaeApiComGoRae10(in *jlexer.Lexer, out *ConjugationNonPersonal) {
 	isTopLevel := in.IsStart()
 	if in.IsNull() {
 		if isTopLevel {
@@ -971,22 +1309,37 @@ func easyjson3e8ab7adDecodeGithubComRaeApiComGoRae9(in *jlexer.Lexer, out *Conju
 	for !in.IsDelim('}') {
 		key := in.UnsafeFieldName(false)
 		in.WantColon()
-		if in.IsNull() {
-			in.Skip()
-			in.WantComma()
-			continue
-		}
 		switch key {
 		case "infinitive":
-			out.Infinitive = string(in.String())
+			if in.IsNull() {
+				in.Skip()
+			} else {
+				out.Infinitive = string(in.String())
+			}
 		case "participle":
-			out.Participle = string(in.String())
+			if in.IsNull() {
+				in.Skip()
+			} else {
+				out.Participle = string(in.String())
+			}
 		case "gerund":
-			out.Gerund = string(in.String())
+			if in.IsNull() {
+				in.Skip()
+			} else {
+				out.Gerund = string(in.String())
+			}
 		case "compound_infinitive":
-			out.CompoundInfinitive = string(in.String())
+			if in.IsNull() {
+				in.Skip()
+			} else {
+				out.CompoundInfinitive = string(in.String())
+			}
 		case "compound_gerund":
-			out.CompoundGerund = string(in.String())
+			if in.IsNull() {
+				in.Skip()
+			} else {
+				out.CompoundGerund = string(in.String())
+			}
 		default:
 			in.SkipRecursive()
 		}
@@ -997,7 +1350,7 @@ func easyjson3e8ab7adDecodeGithubComRaeApiComGoRae9(in *jlexer.Lexer, out *Conju
 		in.Consumed()
 	}
 }
-func easyjson3e8ab7adEncodeGithubComRaeApiComGoRae9(out *jwriter.Writer, in ConjugationNonPersonal) {
+func easyjson3e8ab7adEncodeGithubComRaeApiComGoRae10(out *jwriter.Writer, in ConjugationNonPersonal) {
 	out.RawByte('{')
 	first := true
 	_ = first
@@ -1032,27 +1385,27 @@ func easyjson3e8ab7adEncodeGithubComRaeApiComGoRae9(out *jwriter.Writer, in Conj
 // MarshalJSON supports json.Marshaler interface
 func (v ConjugationNonPersonal) MarshalJSON() ([]byte, error) {
 	w := jwriter.Writer{}
-	easyjson3e8ab7adEncodeGithubComRaeApiComGoRae9(&w, v)
+	easyjson3e8ab7adEncodeGithubComRaeApiComGoRae10(&w, v)
 	return w.Buffer.BuildBytes(), w.Error
 }
 
 // MarshalEasyJSON supports easyjson.Marshaler interface
 func (v ConjugationNonPersonal) MarshalEasyJSON(w *jwriter.Writer) {
-	easyjson3e8ab7adEncodeGithubComRaeApiComGoRae9(w, v)
+	easyjson3e8ab7adEncodeGithubComRaeApiComGoRae10(w, v)
 }
 
 // UnmarshalJSON supports json.Unmarshaler interface
 func (v *ConjugationNonPersonal) UnmarshalJSON(data []byte) error {
 	r := jlexer.Lexer{Data: data}
-	easyjson3e8ab7adDecodeGithubComRaeApiComGoRae9(&r, v)
+	easyjson3e8ab7adDecodeGithubComRaeApiComGoRae10(&r, v)
 	return r.Error()
 }
 
 // UnmarshalEasyJSON supports easyjson.Unmarshaler interface
 func (v *ConjugationNonPersonal) UnmarshalEasyJSON(l *jlexer.Lexer) {
-	easyjson3e8ab7adDecodeGithubComRaeApiComGoRae9(l, v)
+	easyjson3e8ab7adDecodeGithubComRaeApiComGoRae10(l, v)
 }
-func easyjson3e8ab7adDecodeGithubComRaeApiComGoRae10(in *jlexer.Lexer, out *ConjugationIndicative) {
+func easyjson3e8ab7adDecodeGithubComRaeApiComGoRae11(in *jlexer.Lexer, out *ConjugationIndicative) {
 	isTopLevel := in.IsStart()
 	if in.IsNull() {
 		if isTopLevel {
@@ -1065,32 +1418,67 @@ func easyjson3e8ab7adDecodeGithubComRaeApiComGoRae10(in *jlexer.Lexer, out *Conj
 	for !in.IsDelim('}') {
 		key := in.UnsafeFieldName(false)
 		in.WantColon()
-		if in.IsNull() {
-			in.Skip()
-			in.WantComma()
-			continue
-		}
 		switch key {
 		case "present":
-			(out.Present).UnmarshalEasyJSON(in)
+			if in.IsNull() {
+				in.Skip()
+			} else {
+				(out.Present).UnmarshalEasyJSON(in)
+			}
 		case "present_perfect":
-			(out.PresentPerfect).UnmarshalEasyJSON(in)
+			if in.IsNull() {
+				in.Skip()
+			} else {
+				(out.PresentPerfect).UnmarshalEasyJSON(in)
+			}
 		case "imperfect":
-			(out.Imperfect).UnmarshalEasyJSON(in)
+			if in.IsNull() {
+				in.Skip()
+			} else {
+				(out.Imperfect).UnmarshalEasyJSON(in)
+			}
 		case "past_perfect":
-			(out.PastPerfect).UnmarshalEasyJSON(in)
+			if in.IsNull() {
+				in.Skip()
+			} else {
+				(out.PastPerfect).UnmarshalEasyJSON(in)
+			}
 		case "preterite":
-			(out.Preterite).UnmarshalEasyJSON(in)
+			if in.IsNull() {
+				in.Skip()
+			} else {
+				(out.Preterite).UnmarshalEasyJSON(in)
+			}
 		case "past_anterior":
-			(out.PastAnterior).UnmarshalEasyJSON(in)
+			if in.IsNull() {
+				in.Skip()
+			} else {
+				(out.PastAnterior).UnmarshalEasyJSON(in)
+			}
 		case "future":
-			(out.Future).UnmarshalEasyJSON(in)
+			if in.IsNull() {
+				in.Skip()
+			} else {
+				(out.Future).UnmarshalEasyJSON(in)
+			}
 		case "future_perfect":
-			(out.FuturePerfect).UnmarshalEasyJSON(in)
+			if in.IsNull() {
+				in.Skip()
+			} else {
+				(out.FuturePerfect).UnmarshalEasyJSON(in)
+			}
 		case "conditional":
-			(out.Conditional).UnmarshalEasyJSON(in)
+			if in.IsNull() {
+				in.Skip()
+			} else {
+				(out.Conditional).UnmarshalEasyJSON(in)
+			}
 		case "conditional_perfect":
-			(out.ConditionalPerfect).UnmarshalEasyJSON(in)
+			if in.IsNull() {
+				in.Skip()
+			} else {
+				(out.ConditionalPerfect).UnmarshalEasyJSON(in)
+			}
 		default:
 			in.SkipRecursive()
 		}
@@ -1101,7 +1489,7 @@ func easyjson3e8ab7adDecodeGithubComRaeApiComGoRae10(in *jlexer.Lexer, out *Conj
 		in.Consumed()
 	}
 }
-func easyjson3e8ab7adEncodeGithubComRaeApiComGoRae10(out *jwriter.Writer, in ConjugationIndicative) {
+func easyjson3e8ab7adEncodeGithubComRaeApiComGoRae11(out *jwriter.Writer, in ConjugationIndicative) {
 	out.RawByte('{')
 	first := true
 	_ = first
@@ -1161,27 +1549,27 @@ func easyjson3e8ab7adEncodeGithubComRaeApiComGoRae10(out *jwriter.Writer, in Con
 // MarshalJSON supports json.Marshaler interface
 func (v ConjugationIndicative) MarshalJSON() ([]byte, error) {
 	w := jwriter.Writer{}
-	easyjson3e8ab7adEncodeGithubComRaeApiComGoRae10(&w, v)
+	easyjson3e8ab7adEncodeGithubComRaeApiComGoRae11(&w, v)
 	return w.Buffer.BuildBytes(), w.Error
 }
 
 // MarshalEasyJSON supports easyjson.Marshaler interface
 func (v ConjugationIndicative) MarshalEasyJSON(w *jwriter.Writer) {
-	easyjson3e8ab7adEncodeGithubComRaeApiComGoRae10(w, v)
+	easyjson3e8ab7adEncodeGithubComRaeApiComGoRae11(w, v)
 }
 
 // UnmarshalJSON supports json.Unmarshaler interface
 func (v *ConjugationIndicative) UnmarshalJSON(data []byte) error {
 	r := jlexer.Lexer{Data: data}
-	easyjson3e8ab7adDecodeGithubComRaeApiComGoRae10(&r, v)
+	easyjson3e8ab7adDecodeGithubComRaeApiComGoRae11(&r, v)
 	return r.Error()
 }
 
 // UnmarshalEasyJSON supports easyjson.Unmarshaler interface
 func (v *ConjugationIndicative) UnmarshalEasyJSON(l *jlexer.Lexer) {
-	easyjson3e8ab7adDecodeGithubComRaeApiComGoRae10(l, v)
+	easyjson3e8ab7adDecodeGithubComRaeApiComGoRae11(l, v)
 }
-func easyjson3e8ab7adDecodeGithubComRaeApiComGoRae11(in *jlexer.Lexer, out *ConjugationImperative) {
+func easyjson3e8ab7adDecodeGithubComRaeApiComGoRae12(in *jlexer.Lexer, out *ConjugationImperative) {
 	isTopLevel := in.IsStart()
 	if in.IsNull() {
 		if isTopLevel {
@@ -1194,20 +1582,31 @@ func easyjson3e8ab7adDecodeGithubComRaeApiComGoRae11(in *jlexer.Lexer, out *Conj
 	for !in.IsDelim('}') {
 		key := in.UnsafeFieldName(false)
 		in.WantColon()
-		if in.IsNull() {
-			in.Skip()
-			in.WantComma()
-			continue
-		}
 		switch key {
 		case "singular_second_person":
-			out.SingularSecondPerson = string(in.String())
+			if in.IsNull() {
+				in.Skip()
+			} else {
+				out.SingularSecondPerson = string(in.String())
+			}
 		case "singular_formal_second_person":
-			out.SingularFormalSecondPerson = string(in.String())
+			if in.IsNull() {
+				in.Skip()
+			} else {
+				out.SingularFormalSecondPerson = string(in.String())
+			}
 		case "plural_second_person":
-			out.PluralSecondPerson = string(in.String())
+			if in.IsNull() {
+				in.Skip()
+			} else {
+				out.PluralSecondPerson = string(in.String())
+			}
 		case "plural_formal_second_person":
-			out.PluralFormalSecondPerson = string(in.String())
+			if in.IsNull() {
+				in.Skip()
+			} else {
+				out.PluralFormalSecondPerson = string(in.String())
+			}
 		default:
 			in.SkipRecursive()
 		}
@@ -1218,7 +1617,7 @@ func easyjson3e8ab7adDecodeGithubComRaeApiComGoRae11(in *jlexer.Lexer, out *Conj
 		in.Consumed()
 	}
 }
-func easyjson3e8ab7adEncodeGithubComRaeApiComGoRae11(out *jwriter.Writer, in ConjugationImperative) {
+func easyjson3e8ab7adEncodeGithubComRaeApiComGoRae12(out *jwriter.Writer, in ConjugationImperative) {
 	out.RawByte('{')
 	first := true
 	_ = first
@@ -1248,27 +1647,27 @@ func easyjson3e8ab7adEncodeGithubComRaeApiComGoRae11(out *jwriter.Writer, in Con
 // MarshalJSON supports json.Marshaler interface
 func (v ConjugationImperative) MarshalJSON() ([]byte, error) {
 	w := jwriter.Writer{}
-	easyjson3e8ab7adEncodeGithubComRaeApiComGoRae11(&w, v)
+	easyjson3e8ab7adEncodeGithubComRaeApiComGoRae12(&w, v)
 	return w.Buffer.BuildBytes(), w.Error
 }
 
 // MarshalEasyJSON supports easyjson.Marshaler interface
 func (v ConjugationImperative) MarshalEasyJSON(w *jwriter.Writer) {
-	easyjson3e8ab7adEncodeGithubComRaeApiComGoRae11(w, v)
+	easyjson3e8ab7adEncodeGithubComRaeApiComGoRae12(w, v)
 }
 
 // UnmarshalJSON supports json.Unmarshaler interface
 func (v *ConjugationImperative) UnmarshalJSON(data []byte) error {
 	r := jlexer.Lexer{Data: data}
-	easyjson3e8ab7adDecodeGithubComRaeApiComGoRae11(&r, v)
+	easyjson3e8ab7adDecodeGithubComRaeApiComGoRae12(&r, v)
 	return r.Error()
 }
 
 // UnmarshalEasyJSON supports easyjson.Unmarshaler interface
 func (v *ConjugationImperative) UnmarshalEasyJSON(l *jlexer.Lexer) {
-	easyjson3e8ab7adDecodeGithubComRaeApiComGoRae11(l, v)
+	easyjson3e8ab7adDecodeGithubComRaeApiComGoRae12(l, v)
 }
-func easyjson3e8ab7adDecodeGithubComRaeApiComGoRae12(in *jlexer.Lexer, out *Conjugation) {
+func easyjson3e8ab7adDecodeGithubComRaeApiComGoRae13(in *jlexer.Lexer, out *Conjugation) {
 	isTopLevel := in.IsStart()
 	if in.IsNull() {
 		if isTopLevel {
@@ -1281,28 +1680,55 @@ func easyjson3e8ab7adDecodeGithubComRaeApiComGoRae12(in *jlexer.Lexer, out *Conj
 	for !in.IsDelim('}') {
 		key := in.UnsafeFieldName(false)
 		in.WantColon()
-		if in.IsNull() {
-			in.Skip()
-			in.WantComma()
-			continue
-		}
 		switch key {
 		case "singular_first_person":
-			out.SingularFirstPerson = string(in.String())
+			if in.IsNull() {
+				in.Skip()
+			} else {
+				out.SingularFirstPerson = string(in.String())
+			}
 		case "singular_second_person":
-			out.SingularSecondPerson = string(in.String())
+			if in.IsNull() {
+				in.Skip()
+			} else {
+				out.SingularSecondPerson = string(in.String())
+			}
 		case "singular_formal_second_person":
-			out.SingularFormalSecondPerson = string(in.String())
+			if in.IsNull() {
+				in.Skip()
+			} else {
+				out.SingularFormalSecondPerson = string(in.String())
+			}
 		case "singular_third_person":
-			out.SingularThirdPerson = string(in.String())
+			if in.IsNull() {
+				in.Skip()
+			} else {
+				out.SingularThirdPerson = string(in.String())
+			}
 		case "plural_first_person":
-			out.PluralFirstPerson = string(in.String())
+			if in.IsNull() {
+				in.Skip()
+			} else {
+				out.PluralFirstPerson = string(in.String())
+			}
 		case "plural_second_person":
-			out.PluralSecondPerson = string(in.String())
+			if in.IsNull() {
+				in.Skip()
+			} else {
+				out.PluralSecondPerson = string(in.String())
+			}
 		case "plural_formal_second_person":
-			out.PluralFormalSecondPerson = string(in.String())
+			if in.IsNull() {
+				in.Skip()
+			} else {
+				out.PluralFormalSecondPerson = string(in.String())
+			}
 		case "plural_third_person":
-			out.PluralThirdPerson = string(in.String())
+			if in.IsNull() {
+				in.Skip()
+			} else {
+				out.PluralThirdPerson = string(in.String())
+			}
 		default:
 			in.SkipRecursive()
 		}
@@ -1313,7 +1739,7 @@ func easyjson3e8ab7adDecodeGithubComRaeApiComGoRae12(in *jlexer.Lexer, out *Conj
 		in.Consumed()
 	}
 }
-func easyjson3e8ab7adEncodeGithubComRaeApiComGoRae12(out *jwriter.Writer, in Conjugation) {
+func easyjson3e8ab7adEncodeGithubComRaeApiComGoRae13(out *jwriter.Writer, in Conjugation) {
 	out.RawByte('{')
 	first := true
 	_ = first
@@ -1363,27 +1789,27 @@ func easyjson3e8ab7adEncodeGithubComRaeApiComGoRae12(out *jwriter.Writer, in Con
 // MarshalJSON supports json.Marshaler interface
 func (v Conjugation) MarshalJSON() ([]byte, error) {
 	w := jwriter.Writer{}
-	easyjson3e8ab7adEncodeGithubComRaeApiComGoRae12(&w, v)
+	easyjson3e8ab7adEncodeGithubComRaeApiComGoRae13(&w, v)
 	return w.Buffer.BuildBytes(), w.Error
 }
 
 // MarshalEasyJSON supports easyjson.Marshaler interface
 func (v Conjugation) MarshalEasyJSON(w *jwriter.Writer) {
-	easyjson3e8ab7adEncodeGithubComRaeApiComGoRae12(w, v)
+	easyjson3e8ab7adEncodeGithubComRaeApiComGoRae13(w, v)
 }
 
 // UnmarshalJSON supports json.Unmarshaler interface
 func (v *Conjugation) UnmarshalJSON(data []byte) error {
 	r := jlexer.Lexer{Data: data}
-	easyjson3e8ab7adDecodeGithubComRaeApiComGoRae12(&r, v)
+	easyjson3e8ab7adDecodeGithubComRaeApiComGoRae13(&r, v)
 	return r.Error()
 }
 
 // UnmarshalEasyJSON supports easyjson.Unmarshaler interface
 func (v *Conjugation) UnmarshalEasyJSON(l *jlexer.Lexer) {
-	easyjson3e8ab7adDecodeGithubComRaeApiComGoRae12(l, v)
+	easyjson3e8ab7adDecodeGithubComRaeApiComGoRae13(l, v)
 }
-func easyjson3e8ab7adDecodeGithubComRaeApiComGoRae13(in *jlexer.Lexer, out *Article) {
+func easyjson3e8ab7adDecodeGithubComRaeApiComGoRae14(in *jlexer.Lexer, out *Article) {
 	isTopLevel := in.IsStart()
 	if in.IsNull() {
 		if isTopLevel {
@@ -1396,16 +1822,19 @@ func easyjson3e8ab7adDecodeGithubComRaeApiComGoRae13(in *jlexer.Lexer, out *Arti
 	for !in.IsDelim('}') {
 		key := in.UnsafeFieldName(false)
 		in.WantColon()
-		if in.IsNull() {
-			in.Skip()
-			in.WantComma()
-			continue
-		}
 		switch key {
 		case "category":
-			out.Category = ArticleCategory(in.String())
+			if in.IsNull() {
+				in.Skip()
+			} else {
+				out.Category = ArticleCategory(in.String())
+			}
 		case "gender":
-			out.Gender = Gender(in.String())
+			if in.IsNull() {
+				in.Skip()
+			} else {
+				out.Gender = Gender(in.String())
+			}
 		default:
 			in.SkipRecursive()
 		}
@@ -1416,7 +1845,7 @@ func easyjson3e8ab7adDecodeGithubComRaeApiComGoRae13(in *jlexer.Lexer, out *Arti
 		in.Consumed()
 	}
 }
-func easyjson3e8ab7adEncodeGithubComRaeApiComGoRae13(out *jwriter.Writer, in Article) {
+func easyjson3e8ab7adEncodeGithubComRaeApiComGoRae14(out *jwriter.Writer, in Article) {
 	out.RawByte('{')
 	first := true
 	_ = first
@@ -1436,135 +1865,23 @@ func easyjson3e8ab7adEncodeGithubComRaeApiComGoRae13(out *jwriter.Writer, in Art
 // MarshalJSON supports json.Marshaler interface
 func (v Article) MarshalJSON() ([]byte, error) {
 	w := jwriter.Writer{}
-	easyjson3e8ab7adEncodeGithubComRaeApiComGoRae13(&w, v)
-	return w.Buffer.BuildBytes(), w.Error
-}
-
-// MarshalEasyJSON supports easyjson.Marshaler interface
-func (v Article) MarshalEasyJSON(w *jwriter.Writer) {
-	easyjson3e8ab7adEncodeGithubComRaeApiComGoRae13(w, v)
-}
-
-// UnmarshalJSON supports json.Unmarshaler interface
-func (v *Article) UnmarshalJSON(data []byte) error {
-	r := jlexer.Lexer{Data: data}
-	easyjson3e8ab7adDecodeGithubComRaeApiComGoRae13(&r, v)
-	return r.Error()
-}
-
-// UnmarshalEasyJSON supports easyjson.Unmarshaler interface
-func (v *Article) UnmarshalEasyJSON(l *jlexer.Lexer) {
-	easyjson3e8ab7adDecodeGithubComRaeApiComGoRae13(l, v)
-}
-func easyjson3e8ab7adDecodeGithubComRaeApiComGoRae14(in *jlexer.Lexer, out *AdditionalSense) {
-	isTopLevel := in.IsStart()
-	if in.IsNull() {
-		if isTopLevel {
-			in.Consumed()
-		}
-		in.Skip()
-		return
-	}
-	in.Delim('{')
-	for !in.IsDelim('}') {
-		key := in.UnsafeFieldName(false)
-		in.WantColon()
-		if in.IsNull() {
-			in.Skip()
-			in.WantComma()
-			continue
-		}
-		switch key {
-		case "number":
-			out.Number = int(in.Int())
-		case "definition":
-			out.Definition = string(in.String())
-		case "locutions":
-			if in.IsNull() {
-				in.Skip()
-				out.Locutions = nil
-			} else {
-				in.Delim('[')
-				if out.Locutions == nil {
-					if !in.IsDelim(']') {
-						out.Locutions = make([]Locution, 0, 2)
-					} else {
-						out.Locutions = []Locution{}
-					}
-				} else {
-					out.Locutions = (out.Locutions)[:0]
-				}
-				for !in.IsDelim(']') {
-					var v16 Locution
-					(v16).UnmarshalEasyJSON(in)
-					out.Locutions = append(out.Locutions, v16)
-					in.WantComma()
-				}
-				in.Delim(']')
-			}
-		default:
-			in.SkipRecursive()
-		}
-		in.WantComma()
-	}
-	in.Delim('}')
-	if isTopLevel {
-		in.Consumed()
-	}
-}
-func easyjson3e8ab7adEncodeGithubComRaeApiComGoRae14(out *jwriter.Writer, in AdditionalSense) {
-	out.RawByte('{')
-	first := true
-	_ = first
-	{
-		const prefix string = ",\"number\":"
-		out.RawString(prefix[1:])
-		out.Int(int(in.Number))
-	}
-	{
-		const prefix string = ",\"definition\":"
-		out.RawString(prefix)
-		out.String(string(in.Definition))
-	}
-	{
-		const prefix string = ",\"locutions\":"
-		out.RawString(prefix)
-		if in.Locutions == nil && (out.Flags&jwriter.NilSliceAsEmpty) == 0 {
-			out.RawString("null")
-		} else {
-			out.RawByte('[')
-			for v17, v18 := range in.Locutions {
-				if v17 > 0 {
-					out.RawByte(',')
-				}
-				(v18).MarshalEasyJSON(out)
-			}
-			out.RawByte(']')
-		}
-	}
-	out.RawByte('}')
-}
-
-// MarshalJSON supports json.Marshaler interface
-func (v AdditionalSense) MarshalJSON() ([]byte, error) {
-	w := jwriter.Writer{}
 	easyjson3e8ab7adEncodeGithubComRaeApiComGoRae14(&w, v)
 	return w.Buffer.BuildBytes(), w.Error
 }
 
 // MarshalEasyJSON supports easyjson.Marshaler interface
-func (v AdditionalSense) MarshalEasyJSON(w *jwriter.Writer) {
+func (v Article) MarshalEasyJSON(w *jwriter.Writer) {
 	easyjson3e8ab7adEncodeGithubComRaeApiComGoRae14(w, v)
 }
 
 // UnmarshalJSON supports json.Unmarshaler interface
-func (v *AdditionalSense) UnmarshalJSON(data []byte) error {
+func (v *Article) UnmarshalJSON(data []byte) error {
 	r := jlexer.Lexer{Data: data}
 	easyjson3e8ab7adDecodeGithubComRaeApiComGoRae14(&r, v)
 	return r.Error()
 }
 
 // UnmarshalEasyJSON supports easyjson.Unmarshaler interface
-func (v *AdditionalSense) UnmarshalEasyJSON(l *jlexer.Lexer) {
+func (v *Article) UnmarshalEasyJSON(l *jlexer.Lexer) {
 	easyjson3e8ab7adDecodeGithubComRaeApiComGoRae14(l, v)
 }

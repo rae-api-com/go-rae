@@ -87,20 +87,30 @@ const (
 	VerbalModeNonPersonal VerbalMode = "nonpersonal"
 )
 
+// RelatedWord represents a synonym or antonym with an optional usage label.
+//
+//easyjson:json
+type RelatedWord struct {
+	Word  string `json:"word"`
+	Label string `json:"label,omitempty"`
+}
+
 // Definition represents a word definition.
 //
 //easyjson:json
 type Definition struct {
-	Raw           string        `json:"raw"`
-	MeaningNumber int           `json:"meaning_number"`
-	Category      WordCategory  `json:"category"`
-	VerbCategory  *VerbCategory `json:"verb_category,omitempty"`
-	Gender        *Gender       `json:"gender,omitempty"`
-	Article       *Article      `json:"article,omitempty"`
-	Usage         Usage         `json:"usage"`
-	Description   string        `json:"description"`
-	Synonyms      []string      `json:"synonyms"`
-	Antonyms      []string      `json:"antonyms"`
+	Raw             string        `json:"raw"`
+	MeaningNumber   int           `json:"meaning_number"`
+	Category        WordCategory  `json:"category"`
+	VerbCategory    *VerbCategory `json:"verb_category,omitempty"`
+	Gender          *Gender       `json:"gender,omitempty"`
+	Article         *Article      `json:"article,omitempty"`
+	Usage           Usage         `json:"usage"`
+	Description     string        `json:"description"`
+	Examples        []string      `json:"examples,omitempty"`
+	CrossReferences []string      `json:"cross_references,omitempty"`
+	Synonyms        []RelatedWord `json:"synonyms"`
+	Antonyms        []RelatedWord `json:"antonyms"`
 }
 
 type Origin struct {
@@ -171,16 +181,9 @@ type WordEntry struct {
 }
 
 //easyjson:json
-type AdditionalSense struct {
-	Number     int        `json:"number"`
-	Definition string     `json:"definition"`
-	Locutions  []Locution `json:"locutions"`
-}
-
-//easyjson:json
 type Locution struct {
-	Text       string `json:"text"`
-	Definition string `json:"definition"`
+	Expression string       `json:"expression"`
+	Senses     []Definition `json:"senses"`
 }
 
 //easyjson:json
@@ -203,8 +206,10 @@ type Article struct {
 
 //easyjson:json
 type Meaning struct {
+	HomonymIndex int           `json:"homonym_index,omitempty"`
 	Origin       *Origin       `json:"origin,omitempty"`
 	Definitions  []Definition  `json:"senses"`
+	Locutions    []Locution    `json:"locutions,omitempty"`
 	Conjugations *Conjugations `json:"conjugations,omitempty"`
 }
 
