@@ -95,6 +95,16 @@ type RelatedWord struct {
 	Label string `json:"label,omitempty"`
 }
 
+// Region represents a geographic mark of a definition. Code holds the ISO 3166
+// country code when the region is a country; it is empty for supranational or
+// subnational marks (e.g. "América", Spanish provinces).
+//
+//easyjson:json
+type Region struct {
+	Code string `json:"code,omitempty"`
+	Name string `json:"name"`
+}
+
 // Definition represents a word definition.
 //
 //easyjson:json
@@ -107,6 +117,9 @@ type Definition struct {
 	Article         *Article      `json:"article,omitempty"`
 	Usage           Usage         `json:"usage"`
 	Description     string        `json:"description"`
+	UsageNotes      []string      `json:"usage_notes,omitempty"`
+	Regions         []Region      `json:"regions,omitempty"`
+	Fields          []string      `json:"fields,omitempty"`
 	Examples        []string      `json:"examples,omitempty"`
 	CrossReferences []string      `json:"cross_references,omitempty"`
 	Synonyms        []string      `json:"synonyms"`
